@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 
-debug=false
 mntDir="mntdir"
 outDir="outdir"
 
 function log() {
     local msg="$1"
-    printf '%s\n' "$msg"
+    printf '%s\n' "${msg}"
 }
 
 function loadPlugins {
     log "* load plugins start" debug
     for load in $(find "bin/" -name '*.sh'); do
-        . $load
+        . "${load}"
         log "loaded ${load}" "debug"
     done
     log "* load plugins done" debug
 }
 
+
 function showHelp() {
     printf 'extractor v0.0.7 - cannot be used on computers'
     printf 'Usage: extractor.sh [switches] [input path] [output path]\n'
-    printf '%s \n' "--dirname -d path where is image file stored"
+    printf '%s \n' "--outdir -o path where is image file stored"
     printf '%s \n' "--extract <image name> <outputdir> extract files from single image"
     printf '%s \n' "--all process all images is possible (littlebit faulty, overwrite target)"
     printf '%s \n' "--magic magically fix device if some fails"
@@ -30,9 +30,9 @@ function showHelp() {
 
 function magic() {
     dir_name="$(pwd)";
-    for mnt in $(mount | grep $(pwd) | awk '{print $3}'); do
+    for mnt in $(mount | grep "$(pwd)" | awk '{print $3}'); do
         echo "umounting: ${mnt}"
-        umount -f ${mnt}
+        umount -f "${mnt}"
     done
 
     for loop in $(losetup | grep "${dir_name}" | awk '{print $1}'); do
@@ -42,11 +42,10 @@ function magic() {
 }
 
 function extractAllImages() {
-    mkdir -r $mntDir
+    mkdir -p "${mntDir}"
 #    rm -rf $outDir/*
-    mkdir -r $outDir
-
-    for image in $(find "diskety/" -name '*.img'); do
+    mkdir -p "${outDir}"
+    find "diskety/" -name '*.img' -print0 | while IFS= read -r -d $'\0' image; do
         extractImage "${image}" "${outdir}"
     done
 }
@@ -55,8 +54,8 @@ loadPlugins
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --dirname|-d)
-        dirname="$2"
+    --outdir|-o)
+        outdir="$2"
         shift
         shift
         ;;

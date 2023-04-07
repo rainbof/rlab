@@ -18,8 +18,7 @@ outdir/
 mntdir/
 
 # Magic function and "helpme" section
-this function is not implementd, will be implemented later.
-maybe
+-- magic is set of unmount, losetup -d
 
 ## mount: /home/rainbof/dev/rlab/mntdir: wrong fs type, bad option, bad superblock on /dev/loop59, missing codepage or helper program, or other error.
 System (mount) not recognize FS type. Maybe is good idea add option to fix this.
