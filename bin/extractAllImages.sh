@@ -6,5 +6,6 @@ function extractAllImages() {
 
     for image in $(find "diskety/" -name '*.img'); do
         extractImage "${image}" "${outdir}"
+        magic
     done
 }

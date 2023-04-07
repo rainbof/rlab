@@ -3,13 +3,17 @@
 function extractImage {
     image="$1"
     outdir="$2"
+
+    extract_path="${outDir}/$(basename "${image}")"
     if [[  -s "${image}" ]]; then
         dev="$(losetup -f)"
         log "processing ${image}" "debug"
         losetup "${dev}" "${image}"
         mount "${dev}" "${mntDir}"
-        mkdir "${outDir}/$(basename ${image})"
-        cp -r ${mntDir}/* "${outDir}"/"$(basename ${image})"
+        if ! [[ -d "${extract_path}" ]]; then
+            mkdir "${extract_path}"
+        fi
+        cp -r ${mntDir}/* "${extract_path}"
         sync
         umount "${mntDir}"
         losetup -D "${dev}"

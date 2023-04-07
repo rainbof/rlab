@@ -20,14 +20,26 @@ function loadPlugins {
 
 function showHelp() {
     printf 'extractor v0.0.7 - cannot be used on computers'
-    printf 'Usage: extractor.sh [switches] [inut path] [output path]\n'
+    printf 'Usage: extractor.sh [switches] [input path] [output path]\n'
     printf '%s \n' "--dirname -d path where is image file stored"
     printf '%s \n' "--extract <image name> <outputdir> extract files from single image"
     printf '%s \n' "--all process all images is possible (littlebit faulty, overwrite target)"
-    printf '%s \n' "--magic magically fix device"
+    printf '%s \n' "--magic magically fix device if some fails"
     return 0
 }
 
+function magic() {
+    dir_name="$(pwd)";
+    for mnt in $(mount | grep $(pwd) | awk '{print $3}'); do
+        echo "umounting: ${mnt}"
+        umount -f ${mnt}
+    done
+
+    for loop in $(losetup | grep "${dir_name}" | awk '{print $1}'); do
+        echo "destroy loop ${loop}"
+        losetup -D "${loop}"
+    done
+}
 
 function extractAllImages() {
     mkdir -r $mntDir
@@ -53,7 +65,7 @@ while [[ $# -gt 0 ]]; do
         exit 0
         shift
         ;;
-    --run)
+    --all)
         #experimental :D
         extractAllImages
         shift
@@ -72,6 +84,10 @@ while [[ $# -gt 0 ]]; do
             shift
         fi
         
+        ;;
+    --magic)
+        magic
+        shift
         ;;
     *)
         printf 'invalid option %s\n' "$@"
